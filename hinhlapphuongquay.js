@@ -43,7 +43,7 @@ void main() {
 `;
 
 var vertices = new Float32Array([
-    -0.5, -0.5, 0.5, 0.5, -0.5, 0.5, 0.5, 0.5, 0.5, -0.5, 0.5, 0.5,    // v0-v1-v2-v3 front
+    -0.5, -0.5, 0.5, 0.5, -0.5, 0.5, 0.5, 0.5, 0.5, -0.5, 0.5, 0.5,     // v0-v1-v2-v3 front
     -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, -0.5, -0.5, 0.5, -0.5,  // v4-v5-v6-v7 back
     -0.5, 0.5, 0.5, -0.5, 0.5, -0.5, -0.5, -0.5, -0.5, -0.5, -0.5, 0.5,  // v3-v7-v4-v0 left
     0.5, 0.5, 0.5, 0.5, 0.5, -0.5, 0.5, -0.5, -0.5, 0.5, -0.5, 0.5,   // v2-v6-v5-v1 right
@@ -53,26 +53,26 @@ var vertices = new Float32Array([
 
 var normals = new Float32Array([
     0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0,     // v0-v1-v2-v3 front
-    0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0,    // v4-v5-v6-v7 back
-    -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0,    // v3-v7-v4-v0 left
+    0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0,     // v4-v5-v6-v7 back
+    -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0,     // v3-v7-v4-v0 left
     1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0,     // v2-v6-v5-v1 right
     0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0,     // v3-v2-v6-v7 top
-    0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0    // v0-v4-v5-v1 bottom
+    0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0     // v0-v4-v5-v1 bottom
 ]);
 
 var texCoords = new Float32Array([
-    1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0,    // v0-v1-v2-v3 front
-    0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0,    // v4-v5-v6-v7 back
-    1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0,    // v3-v7-v4-v0 left
-    0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0,    // v2-v6-v5-v1 right
-    1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0,    // v3-v2-v6-v7 top
-    1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0     // v0-v4-v5-v1 bottom
+    1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0,     // v0-v1-v2-v3 front
+    0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0,     // v4-v5-v6-v7 back
+    1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0,     // v3-v7-v4-v0 left
+    0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0,     // v2-v6-v5-v1 right
+    1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0,     // v3-v2-v6-v7 top
+    1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0      // v0-v4-v5-v1 bottom
 ]);
 
 var indices = new Uint8Array([
-    0, 1, 2, 0, 2, 3,    // front
-    4, 5, 6, 4, 6, 7,    // back
-    8, 9, 10, 8, 10, 11,   // left
+    0, 1, 2, 0, 2, 3,     // front
+    4, 5, 6, 4, 6, 7,     // back
+    8, 9, 10, 8, 10, 11,    // left
     12, 13, 14, 12, 14, 15,  // right
     16, 17, 18, 16, 18, 19,  // top
     20, 21, 22, 20, 22, 23   // bottom
@@ -98,7 +98,7 @@ function main() {
     }
 
     gl.enable(gl.DEPTH_TEST);
-    gl.clearColor(0.0,0.0, 0.0, 1.0);
+    gl.clearColor(0.1, 0.1, 0.1, 0.8);
 
     var u_ModelMatrix = gl.getUniformLocation(gl.program, 'u_ModelMatrix');
     var u_NormalMatrix = gl.getUniformLocation(gl.program, 'u_NormalMatrix');
@@ -112,8 +112,7 @@ function main() {
     var normalMatrix = new Matrix4();
     var viewMatrix = new Matrix4();
     var projMatrix = new Matrix4();
-    var translationMatrix = new Matrix4();
-    var rotationMatrix = new Matrix4();
+    var translationMatrix = new Matrix4(); // Khôi phục
 
     var textures = [];
     var loaded = 0;
@@ -142,45 +141,52 @@ function main() {
         image.src = src;
     });
 
-    let isDragging = false;
-    let dragStartPositionX = 0;
-    let dragStartPositionY = 0;
-
-    let mouseX = 0;
-    let mouseY = 0;
-    let isMouseDown = false;
-    let rotationFactor = 0.01;
+    let isDraggingLeft = false;
+    let isDraggingRight = false;
+    let lastMouseX = 0;
+    let lastMouseY = 0;
     let angleX = 0;
     let angleY = 0;
+    let rotationSpeed = 0.4;
     let freeRotationSpeed = 1;
+    let dragStartPositionX = 0;
+    let dragStartPositionY = 0;
+    let dragSensitivity = 0.01; // Khôi phục
 
     canvas.addEventListener('mousedown', (event) => {
-        if (event.button === 2) {
-            isDragging = true;
+        if (event.button === 0) {
+            isDraggingLeft = true;
+            lastMouseX = event.clientX;
+            lastMouseY = event.clientY;
+        } else if (event.button === 2) {
+            isDraggingRight = true;
             dragStartPositionX = event.clientX;
             dragStartPositionY = event.clientY;
-        } else if (event.button === 0){
-            isMouseDown = true;
         }
     });
 
     canvas.addEventListener('mouseup', (event) => {
-        if (event.button === 2) {
-            isDragging = false;
-        } else if (event.button === 0){
-            isMouseDown = false;
+        if (event.button === 0) {
+            isDraggingLeft = false;
+        } else if (event.button === 2) {
+            isDraggingRight = false;
         }
     });
 
     canvas.addEventListener('mousemove', (event) => {
-        const rect = canvas.getBoundingClientRect();
-        const x = ((event.clientX - rect.left) / rect.width - 0.5) * 2;
-        const y = ((event.clientY - rect.top) / rect.height - 0.5) * -2;
-        if (isDragging) {
+        if (isDraggingLeft) {
+            const deltaX = event.clientX - lastMouseX;
+            const deltaY = event.clientY - lastMouseY;
+
+            angleX += deltaX * rotationSpeed;
+            angleY += deltaY * rotationSpeed;
+
+            lastMouseX = event.clientX;
+            lastMouseY = event.clientY;
+        } else if (isDraggingRight) {
             const deltaX = event.clientX - dragStartPositionX;
             const deltaY = event.clientY - dragStartPositionY;
 
-            const dragSensitivity = 0.01;
             const xTranslation = deltaX * dragSensitivity;
             const yTranslation = -deltaY * dragSensitivity;
 
@@ -188,26 +194,23 @@ function main() {
 
             dragStartPositionX = event.clientX;
             dragStartPositionY = event.clientY;
-        } else if (isMouseDown) {
-            angleX -= (x - mouseX) * rotationFactor * 500;
-            angleY -= (y - mouseY) * rotationFactor * 500;
         }
-        mouseX = x;
-        mouseY = y;
+    });
+
+    canvas.addEventListener('contextmenu', (event) => {
+        event.preventDefault();
     });
 
     function tick() {
-        if (!isMouseDown && !isDragging) {
-            angleX += freeRotationSpeed * 0.5;
-            angleY += freeRotationSpeed * 0.5;
+        if (!isDraggingLeft) {
+            angleX += freeRotationSpeed * 0.7;
+            angleY += freeRotationSpeed * 0.7;
         }
-
-        rotationMatrix.setRotate(angleX, 0, 1, 0);
-        rotationMatrix.rotate(angleY, 1, 0, 0);
 
         modelMatrix.setIdentity();
         modelMatrix.multiply(translationMatrix);
-        modelMatrix.multiply(rotationMatrix);
+        modelMatrix.rotate(angleY, 1, 0, 0);
+        modelMatrix.rotate(angleX, 0, 1, 0);
 
         normalMatrix.setInverseOf(modelMatrix);
         normalMatrix.transpose();
@@ -221,7 +224,7 @@ function main() {
         gl.uniformMatrix4fv(u_ProjectionMatrix, false, projMatrix.elements);
 
         gl.uniform3f(u_LightColor, 1.0, 1.0, 1.0);
-        gl.uniform3f(u_LightPosition, 3.0, 4.0, 5.0);
+        gl.uniform3f(u_LightPosition, -3.0, 3.0, 5.0);
         gl.uniform3f(u_AmbientColor, 0.3, 0.3, 0.3);
 
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
