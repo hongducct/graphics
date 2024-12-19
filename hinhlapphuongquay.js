@@ -66,13 +66,15 @@ function main() {
 
     var u_ModelMatrix = gl.getUniformLocation(gl.program, 'u_ModelMatrix');
     var modelMatrix = new Matrix4();
+    let translationMatrix = new Matrix4(); // Ma trận lưu vị trí
+    let rotationMatrix = new Matrix4();    // Ma trận lưu góc xoay
 
     gl.enable(gl.DEPTH_TEST);
     gl.clearColor(0, 0, 0, 1.0);
 
     var textures = [];
     var loaded = 0;
-    var imageFiles = ['xucxac1.jpg', 'xucxac2.jpg', 'xucxac3.jpg', 'xucxac4.jpg', 'xucxac5.jpg', 'xucxac6.jpg']; // Đảm bảo các file này tồn tại
+    var imageFiles = ['xucxac1.jpg', 'xucxac2.jpg', 'xucxac3.jpg', 'xucxac4.jpg', 'xucxac5.jpg', 'xucxac6.jpg'];
 
     imageFiles.forEach((src, index) => {
         textures[index] = gl.createTexture();
@@ -97,47 +99,75 @@ function main() {
         image.src = src;
     });
 
+    // Các biến cho kéo chuột phải
+    let isDragging = false;
+    let dragStartPositionX = 0;
+    let dragStartPositionY = 0;
+
+    // Các biến cho xoay chuột trái
     let mouseX = 0;
     let mouseY = 0;
     let isMouseDown = false;
-    let rotationFactor = 0.05;
+    let rotationFactor = 0.01; // Giảm độ nhạy xoay
     let angleX = 0;
     let angleY = 0;
     let freeRotationSpeed = 1;
 
-    canvas.addEventListener('mousedown', () => {
-        isMouseDown = true;
+    canvas.addEventListener('mousedown', (event) => {
+        if (event.button === 2) { // Chuột phải
+            isDragging = true;
+            dragStartPositionX = event.clientX;
+            dragStartPositionY = event.clientY;
+        } else if (event.button === 0){ // Chuột trái
+            isMouseDown = true;
+        }
     });
 
-    canvas.addEventListener('mouseup', () => {
-        isMouseDown = false;
+    canvas.addEventListener('mouseup', (event) => {
+        if (event.button === 2) {
+            isDragging = false;
+        } else if (event.button === 0){
+            isMouseDown = false;
+        }
     });
 
     canvas.addEventListener('mousemove', (event) => {
-        if (isMouseDown) {
-            const rect = canvas.getBoundingClientRect();
-            const x = ((event.clientX - rect.left) / rect.width - 0.5) * 2;
-            const y = ((event.clientY - rect.top) / rect.height - 0.5) * -2;
+        const rect = canvas.getBoundingClientRect();
+        const x = ((event.clientX - rect.left) / rect.width - 0.5) * 2;
+        const y = ((event.clientY - rect.top) / rect.height - 0.5) * -2;
+        if (isDragging) {
+            const deltaX = event.clientX - dragStartPositionX;
+            const deltaY = event.clientY - dragStartPositionY;
+
+            const dragSensitivity = 0.01;
+            const xTranslation = deltaX * dragSensitivity;
+            const yTranslation = -deltaY * dragSensitivity; // Đảo dấu y để di chuyển đúng hướng
+
+            translationMatrix.translate(xTranslation, yTranslation, 0);
+
+            dragStartPositionX = event.clientX;
+            dragStartPositionY = event.clientY;
+        } else if (isMouseDown) {
             angleX -= (x - mouseX) * rotationFactor * 500;
             angleY -= (y - mouseY) * rotationFactor * 500;
-
         }
-        const rect = canvas.getBoundingClientRect();
-            const x = ((event.clientX - rect.left) / rect.width - 0.5) * 2;
-            const y = ((event.clientY - rect.top) / rect.height - 0.5) * -2;
         mouseX = x;
         mouseY = y;
     });
 
-
     function tick() {
-        if (!isMouseDown) {
+        if (!isMouseDown && !isDragging) {
             angleX += freeRotationSpeed * 0.5;
             angleY += freeRotationSpeed * 0.5;
         }
 
-        modelMatrix.setRotate(angleX, 0, 1, 0);
-        modelMatrix.rotate(angleY, 1, 0, 0);
+        rotationMatrix.setRotate(angleX, 0, 1, 0);
+        rotationMatrix.rotate(angleY, 1, 0, 0);
+
+        modelMatrix.setIdentity(); // Reset ma trận model
+        modelMatrix.multiply(translationMatrix); // Áp dụng dịch chuyển trước
+        modelMatrix.multiply(rotationMatrix); // Sau đó áp dụng xoay
+
         gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
 
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
