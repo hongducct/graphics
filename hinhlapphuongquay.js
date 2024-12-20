@@ -227,7 +227,14 @@ function main() {
         let pulse = Math.sin(Date.now() * 0.002) * 0.2 + 0.9; // Vary between 0.7 and 1.1
         let currentScale = scale * pulse;
         modelMatrix.scale(currentScale, currentScale, currentScale);
-    
+
+        // Dynamic background color (example: cycling through shades of blue)
+        let time = Date.now() * 0.001; // For a slower transition
+        let r = 0.6 + Math.sin(time) * 0.1;
+        let g = 0.5 + Math.sin(time + Math.PI / 3) * 0.1;
+        let b = 0.6 + Math.sin(time + (2 * Math.PI) / 3) * 0.1;
+        gl.clearColor(r, g, b, 0.8);
+
         normalMatrix.setInverseOf(modelMatrix);
         normalMatrix.transpose();
 
