@@ -201,6 +201,17 @@ function main() {
         event.preventDefault();
     });
 
+    // Initialize scale
+    let scale = 1.0; 
+
+    // Get the scale slider
+    var scaleSlider = document.getElementById('scaleSlider');
+
+    // Add an event listener to the slider to update the scale value
+    scaleSlider.addEventListener('input', function() {
+        scale = parseFloat(scaleSlider.value); 
+    });
+
     function tick() {
         if (!isDraggingLeft) {
             angleX += freeRotationSpeed * 0.7;
@@ -212,12 +223,18 @@ function main() {
         modelMatrix.rotate(angleY, 1, 0, 0);
         modelMatrix.rotate(angleX, 0, 1, 0);
 
+        // Apply scaling (and pulsating effect) BEFORE sending the matrix to the shader
+        let pulse = Math.sin(Date.now() * 0.002) * 0.2 + 0.9; // Vary between 0.7 and 1.1
+        let currentScale = scale * pulse;
+        modelMatrix.scale(currentScale, currentScale, currentScale);
+    
         normalMatrix.setInverseOf(modelMatrix);
         normalMatrix.transpose();
 
-        viewMatrix.setLookAt(0,0,5,0,0,0,0,1,0);
-        projMatrix.setPerspective(30, canvas.width/canvas.height, 1, 100);
-
+        viewMatrix.setLookAt(0, 0, 5, 0, 0, 0, 0, 1, 0);
+        projMatrix.setPerspective(30, canvas.width / canvas.height, 1, 100);
+    
+        // Send the updated model matrix to the shader
         gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
         gl.uniformMatrix4fv(u_NormalMatrix, false, normalMatrix.elements);
         gl.uniformMatrix4fv(u_ViewMatrix, false, viewMatrix.elements);
