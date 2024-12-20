@@ -27,6 +27,7 @@ varying vec3 v_Position;
 uniform vec3 u_LightColor;
 uniform vec3 u_LightPosition;
 uniform vec3 u_AmbientColor;
+uniform vec3 u_BaseColor; 
 
 void main() {
     vec3 normal = normalize(v_Normal);
@@ -35,10 +36,9 @@ void main() {
     float nDotL = max(dot(lightDirection, normal), 0.0);
 
     vec3 diffuse = u_LightColor * nDotL;
-
     vec3 ambient = u_AmbientColor;
 
-    gl_FragColor = texture2D(u_Sampler, v_TexCoord) * vec4(diffuse + ambient, 1.0);
+    gl_FragColor = texture2D(u_Sampler, v_TexCoord) * vec4(u_BaseColor * (diffuse + ambient) , 1.0);
 }
 `;
 
@@ -79,49 +79,60 @@ var indices = new Uint8Array([
 ]);
 
 function main() {
-    var canvas = document.getElementById('webgl');
+    var canvas = document.getElementById("webgl");
     var gl = getWebGLContext(canvas);
     if (!gl) {
-        console.log('Failed to get the rendering context for WebGL');
+        console.log("Failed to get the rendering context for WebGL");
         return;
     }
 
     if (!initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE)) {
-        console.log('Failed to initialize shaders.');
+        console.log("Failed to initialize shaders.");
         return;
     }
 
     var n = initVertexBuffers(gl);
     if (n < 0) {
-        console.log('Failed to set the positions of the vertices');
+        console.log("Failed to set the positions of the vertices");
         return;
     }
 
     gl.enable(gl.DEPTH_TEST);
     gl.clearColor(0.1, 0.1, 0.1, 0.8);
 
-    var u_ModelMatrix = gl.getUniformLocation(gl.program, 'u_ModelMatrix');
-    var u_NormalMatrix = gl.getUniformLocation(gl.program, 'u_NormalMatrix');
-    var u_ViewMatrix = gl.getUniformLocation(gl.program, 'u_ViewMatrix');
-    var u_ProjectionMatrix = gl.getUniformLocation(gl.program, 'u_ProjectionMatrix');
-    var u_LightColor = gl.getUniformLocation(gl.program, 'u_LightColor');
-    var u_LightPosition = gl.getUniformLocation(gl.program, 'u_LightPosition');
-    var u_AmbientColor = gl.getUniformLocation(gl.program, 'u_AmbientColor');
+    var u_ModelMatrix = gl.getUniformLocation(gl.program, "u_ModelMatrix");
+    var u_NormalMatrix = gl.getUniformLocation(gl.program, "u_NormalMatrix");
+    var u_ViewMatrix = gl.getUniformLocation(gl.program, "u_ViewMatrix");
+    var u_ProjectionMatrix = gl.getUniformLocation(
+        gl.program,
+        "u_ProjectionMatrix"
+    );
+    var u_LightColor = gl.getUniformLocation(gl.program, "u_LightColor");
+    var u_LightPosition = gl.getUniformLocation(gl.program, "u_LightPosition");
+    var u_AmbientColor = gl.getUniformLocation(gl.program, "u_AmbientColor");
+    var u_BaseColor = gl.getUniformLocation(gl.program, "u_BaseColor");
 
     var modelMatrix = new Matrix4();
     var normalMatrix = new Matrix4();
     var viewMatrix = new Matrix4();
     var projMatrix = new Matrix4();
-    var translationMatrix = new Matrix4(); // Khôi phục
+    var translationMatrix = new Matrix4();
 
     var textures = [];
     var loaded = 0;
-    var imageFiles = ['xucxac1.jpg', 'xucxac2.jpg', 'xucxac3.jpg', 'xucxac4.jpg', 'xucxac5.jpg', 'xucxac6.jpg'];
+    var imageFiles = [
+        "xucxac1.jpg",
+        "xucxac2.jpg",
+        "xucxac3.jpg",
+        "xucxac4.jpg",
+        "xucxac5.jpg",
+        "xucxac6.jpg",
+    ];
 
     imageFiles.forEach((src, index) => {
         textures[index] = gl.createTexture();
         var image = new Image();
-        image.onload = function() {
+        image.onload = function () {
             gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
             gl.activeTexture(gl.TEXTURE0);
             gl.bindTexture(gl.TEXTURE_2D, textures[index]);
@@ -151,9 +162,9 @@ function main() {
     let freeRotationSpeed = 1;
     let dragStartPositionX = 0;
     let dragStartPositionY = 0;
-    let dragSensitivity = 0.01; // Khôi phục
+    let dragSensitivity = 0.01;
 
-    canvas.addEventListener('mousedown', (event) => {
+    canvas.addEventListener("mousedown", (event) => {
         if (event.button === 0) {
             isDraggingLeft = true;
             lastMouseX = event.clientX;
@@ -165,7 +176,7 @@ function main() {
         }
     });
 
-    canvas.addEventListener('mouseup', (event) => {
+    canvas.addEventListener("mouseup", (event) => {
         if (event.button === 0) {
             isDraggingLeft = false;
         } else if (event.button === 2) {
@@ -173,7 +184,7 @@ function main() {
         }
     });
 
-    canvas.addEventListener('mousemove', (event) => {
+    canvas.addEventListener("mousemove", (event) => {
         if (isDraggingLeft) {
             const deltaX = event.clientX - lastMouseX;
             const deltaY = event.clientY - lastMouseY;
@@ -197,20 +208,68 @@ function main() {
         }
     });
 
-    canvas.addEventListener('contextmenu', (event) => {
+    canvas.addEventListener("contextmenu", (event) => {
         event.preventDefault();
     });
 
     // Initialize scale
-    let scale = 1.0; 
+    let scale = 1.0;
 
     // Get the scale slider
-    var scaleSlider = document.getElementById('scaleSlider');
+    var scaleSlider = document.getElementById("scaleSlider");
 
     // Add an event listener to the slider to update the scale value
-    scaleSlider.addEventListener('input', function() {
-        scale = parseFloat(scaleSlider.value); 
+    scaleSlider.addEventListener("input", function () {
+        scale = parseFloat(scaleSlider.value);
     });
+
+    // Get the ambient color picker element
+    var ambientColorPicker = document.getElementById("ambientColorPicker");
+
+    // Initialize the ambient color uniform
+    gl.uniform3f(u_AmbientColor, 0.3, 0.3, 0.3); // Default value
+
+    // Add an event listener to update the ambient light color
+    ambientColorPicker.addEventListener("input", function () {
+        let color = hexToRgb(ambientColorPicker.value);
+        gl.uniform3f(u_AmbientColor, color.r, color.g, color.b);
+    });
+
+    // Get the diffuse color picker element
+    var diffuseColorPicker = document.getElementById("diffuseColorPicker");
+
+    // Initialize the diffuse color uniform
+    gl.uniform3f(u_LightColor, 1.0, 1.0, 1.0); // Default white
+
+    // Add an event listener to update the diffuse light color
+    diffuseColorPicker.addEventListener("input", function () {
+        let color = hexToRgb(diffuseColorPicker.value);
+        gl.uniform3f(u_LightColor, color.r, color.g, color.b);
+    });
+
+    // Get the base color picker element
+    var baseColorPicker = document.getElementById("baseColorPicker");
+
+    // Initialize the base color uniform
+    gl.uniform3f(u_BaseColor, 1.0, 1.0, 1.0); // Default white
+
+    // Add an event listener to update the base color
+    baseColorPicker.addEventListener("input", function () {
+        let color = hexToRgb(baseColorPicker.value);
+        gl.uniform3f(u_BaseColor, color.r, color.g, color.b);
+    });
+
+    // Helper function to convert hex color to RGB
+    function hexToRgb(hex) {
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result
+            ? {
+                r: parseInt(result[1], 16) / 255,
+                g: parseInt(result[2], 16) / 255,
+                b: parseInt(result[3], 16) / 255,
+            }
+            : null;
+    }
 
     function tick() {
         if (!isDraggingLeft) {
@@ -223,13 +282,13 @@ function main() {
         modelMatrix.rotate(angleY, 1, 0, 0);
         modelMatrix.rotate(angleX, 0, 1, 0);
 
-        // Apply scaling (and pulsating effect) BEFORE sending the matrix to the shader
+        // Apply scaling (and pulsating effect)
         let pulse = Math.sin(Date.now() * 0.002) * 0.2 + 0.9; // Vary between 0.7 and 1.1
         let currentScale = scale * pulse;
         modelMatrix.scale(currentScale, currentScale, currentScale);
 
-        // Dynamic background color (example: cycling through shades of blue)
-        let time = Date.now() * 0.001; // For a slower transition
+        // Dynamic background color
+        let time = Date.now() * 0.001;
         let r = 0.6 + Math.sin(time) * 0.1;
         let g = 0.5 + Math.sin(time + Math.PI / 3) * 0.1;
         let b = 0.6 + Math.sin(time + (2 * Math.PI) / 3) * 0.1;
@@ -240,16 +299,15 @@ function main() {
 
         viewMatrix.setLookAt(0, 0, 5, 0, 0, 0, 0, 1, 0);
         projMatrix.setPerspective(30, canvas.width / canvas.height, 1, 100);
-    
-        // Send the updated model matrix to the shader
+
+        // Send the updated matrices to the shader
         gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
         gl.uniformMatrix4fv(u_NormalMatrix, false, normalMatrix.elements);
         gl.uniformMatrix4fv(u_ViewMatrix, false, viewMatrix.elements);
         gl.uniformMatrix4fv(u_ProjectionMatrix, false, projMatrix.elements);
 
-        gl.uniform3f(u_LightColor, 1.0, 1.0, 1.0);
+        // Send the light position to the shader
         gl.uniform3f(u_LightPosition, -3.0, 3.0, 5.0);
-        gl.uniform3f(u_AmbientColor, 0.3, 0.3, 0.3);
 
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -269,25 +327,25 @@ function initVertexBuffers(gl) {
     var normalBuffer = gl.createBuffer();
 
     if (!vertexBuffer || !texCoordBuffer || !indexBuffer || !normalBuffer) {
-        console.log('Failed to create buffers');
+        console.log("Failed to create buffers");
         return -1;
     }
 
     gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
-    var a_Position = gl.getAttribLocation(gl.program, 'a_Position');
+    var a_Position = gl.getAttribLocation(gl.program, "a_Position");
     gl.vertexAttribPointer(a_Position, 3, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(a_Position);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, texCoords, gl.STATIC_DRAW);
-    var a_TexCoord = gl.getAttribLocation(gl.program, 'a_TexCoord');
+    var a_TexCoord = gl.getAttribLocation(gl.program, "a_TexCoord");
     gl.vertexAttribPointer(a_TexCoord, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(a_TexCoord);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, normals, gl.STATIC_DRAW);
-    var a_Normal = gl.getAttribLocation(gl.program, 'a_Normal');
+    var a_Normal = gl.getAttribLocation(gl.program, "a_Normal");
     gl.vertexAttribPointer(a_Normal, 3, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(a_Normal);
 
